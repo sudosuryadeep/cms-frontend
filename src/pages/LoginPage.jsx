@@ -18,7 +18,7 @@ export default function LoginPage() {
     try {
       await login(email, password);
       setTimeout(() => {
-        navigate("/", { replace: true });
+        navigate("/app", { replace: true });
       }, 100);
     } catch (err) {
       setError(err.response?.data?.message || "Invalid email or password");
