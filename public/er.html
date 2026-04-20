@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Course Management System — ER Diagram</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0b0f1a;
+    --bg2: #111827;
+    --bg3: #1a2035;
+    --border: rgba(255,255,255,0.07);
+    --border-bright: rgba(255,255,255,0.14);
+    --text: #e8eaf0;
+    --muted: #6b7280;
+    --accent: #6366f1;
+    --accent2: #8b5cf6;
+    --teal: #14b8a6;
+    --coral: #f97316;
+    --pink: #ec4899;
+    --green: #22c55e;
+    --yellow: #eab308;
+    --blue: #3b82f6;
+
+    --t-users: #6366f1;
+    --t-dept: #14b8a6;
+    --t-prof: #f97316;
+    --t-students: #ec4899;
+    --t-courses: #3b82f6;
+    --t-semesters: #eab308;
+    --t-enrollments: #22c55e;
+    --t-grades: #a855f7;
+  }
+
+  body {
+    background: var(--bg);
+    font-family: 'Sora', sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(99,102,241,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(99,102,241,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  header {
+    position: relative;
+    z-index: 10;
+    padding: 40px 60px 30px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .header-left h1 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.5px;
+  }
+
+  .header-left p {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 6px;
+    font-weight: 300;
+  }
+
+  .legend {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .canvas-wrap {
+    position: relative;
+    z-index: 1;
+    padding: 50px 40px 60px;
+    overflow-x: auto;
+  }
+
+  svg#erd {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    overflow: visible;
+  }
+
+  /* Table group styles */
+  .tbl-group { cursor: pointer; }
+  .tbl-group:hover .tbl-header { filter: brightness(1.15); }
+  .tbl-group:hover .tbl-body { filter: brightness(1.06); }
+
+  .tbl-header {
+    transition: filter 0.2s;
+  }
+  .tbl-body {
+    transition: filter 0.2s;
+  }
+
+  .tbl-row-even { fill: rgba(255,255,255,0.025); }
+  .tbl-row-odd  { fill: rgba(255,255,255,0.01); }
+
+  /* Connector lines */
+  .conn-line {
+    fill: none;
+    stroke-width: 1.5;
+    stroke-dasharray: none;
+    opacity: 0.55;
+    transition: opacity 0.2s;
+  }
+
+  /* Tooltip */
+  #tooltip {
+    position: fixed;
+    background: var(--bg2);
+    border: 1px solid var(--border-bright);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text);
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.15s;
+    max-width: 200px;
+    line-height: 1.6;
+  }
+
+  footer {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 20px;
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1>// course_management_system.erd</h1>
+    <p>Entity Relationship Diagram &nbsp;·&nbsp; 8 tables &nbsp;·&nbsp; 11 relationships</p>
+  </div>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#6366f1"></div>users</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#14b8a6"></div>departments</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#f97316"></div>professors</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#ec4899"></div>students</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div>courses</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#eab308"></div>semesters</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div>enrollments</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#a855f7"></div>grades</div>
+  </div>
+</header>
+
+<div class="canvas-wrap">
+<svg id="erd" viewBox="0 0 1300 860" width="1300" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <marker id="arrow-teal"   viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9" fill="none" stroke="#14b8a6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+  <marker id="arrow-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9" fill="none" stroke="#f97316" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+  <marker id="arrow-pink"   viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9" fill="none" stroke="#ec4899" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+  <marker id="arrow-blue"   viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9" fill="none" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+  <marker id="arrow-green"  viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9" fill="none" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+  <marker id="arrow-yellow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9" fill="none" stroke="#eab308" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+  <marker id="arrow-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9" fill="none" stroke="#a855f7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+  <filter id="glow-teal"><feGaussianBlur stdDeviation="3" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
+
+  <!-- Subtle glow for active connections -->
+  <filter id="glow">
+    <feGaussianBlur stdDeviation="2.5" result="blur"/>
+    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+</defs>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- CONNECTOR LINES (drawn first, behind tables) -->
+<!-- ═══════════════════════════════════════════════════════ -->
+
+<!-- DEPARTMENTS → PROFESSORS (right of dept → left of prof) -->
+<path class="conn-line" stroke="#14b8a6"
+  d="M 460 195 L 520 195 L 520 180 L 570 180"
+  marker-end="url(#arrow-teal)" data-rel="departments → professors"/>
+
+<!-- DEPARTMENTS → STUDENTS (bottom of dept → top of students) -->
+<path class="conn-line" stroke="#ec4899"
+  d="M 310 270 L 310 330 L 200 330 L 200 360"
+  marker-end="url(#arrow-pink)" data-rel="departments → students"/>
+
+<!-- DEPARTMENTS → COURSES (right of dept → left of courses) -->
+<path class="conn-line" stroke="#3b82f6"
+  d="M 460 220 L 490 220 L 490 590 L 570 590"
+  marker-end="url(#arrow-blue)" data-rel="departments → courses"/>
+
+<!-- PROFESSORS → COURSES (bottom of prof → top of courses) -->
+<path class="conn-line" stroke="#f97316"
+  d="M 700 290 L 700 560 L 730 560 L 730 580"
+  marker-end="url(#arrow-orange)" data-rel="professors → courses"/>
+
+<!-- STUDENTS → ENROLLMENTS (right of students → left of enrollments) -->
+<path class="conn-line" stroke="#22c55e"
+  d="M 370 450 L 420 450 L 420 680 L 570 680"
+  marker-end="url(#arrow-green)" data-rel="students → enrollments"/>
+
+<!-- COURSES → ENROLLMENTS (bottom of courses → top of enrollments) -->
+<path class="conn-line" stroke="#22c55e"
+  d="M 730 700 L 730 720 L 700 720 L 700 710"
+  marker-end="url(#arrow-green)" data-rel="courses → enrollments"/>
+
+<!-- SEMESTERS → ENROLLMENTS (left of semesters → right of enrollments) -->
+<path class="conn-line" stroke="#eab308"
+  d="M 930 680 L 900 680 L 900 680 L 890 680"
+  marker-end="url(#arrow-yellow)" data-rel="semesters → enrollments"/>
+
+<!-- ENROLLMENTS → GRADES (right of enrollments → left of grades) -->
+<path class="conn-line" stroke="#a855f7"
+  d="M 890 700 L 920 700 L 920 790 L 960 790"
+  marker-end="url(#arrow-purple)" data-rel="enrollments → grades"/>
+
+<!-- Relationship cardinality labels -->
+<text x="486" y="172" font-family="JetBrains Mono, monospace" font-size="10" fill="#14b8a6" opacity="0.75">1:N</text>
+<text x="292" y="326" font-family="JetBrains Mono, monospace" font-size="10" fill="#ec4899" opacity="0.75">1:N</text>
+<text x="464" y="414" font-family="JetBrains Mono, monospace" font-size="10" fill="#3b82f6" opacity="0.75">1:N</text>
+<text x="704" y="430" font-family="JetBrains Mono, monospace" font-size="10" fill="#f97316" opacity="0.75">1:N</text>
+<text x="398" y="670" font-family="JetBrains Mono, monospace" font-size="10" fill="#22c55e" opacity="0.75">1:N</text>
+<text x="706" y="714" font-family="JetBrains Mono, monospace" font-size="10" fill="#22c55e" opacity="0.75">1:N</text>
+<text x="895" y="670" font-family="JetBrains Mono, monospace" font-size="10" fill="#eab308" opacity="0.75">1:N</text>
+<text x="898" y="756" font-family="JetBrains Mono, monospace" font-size="10" fill="#a855f7" opacity="0.75">1:1</text>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- TABLE: USERS  (top-left, standalone)  x=40 y=80 -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<g class="tbl-group" id="tbl-users" data-table="users">
+  <!-- Header -->
+  <rect class="tbl-header" x="40" y="80" width="220" height="38" rx="10" ry="0" fill="#6366f1" opacity="0.92"/>
+  <rect x="40" y="104" width="220" height="14" fill="#6366f1" opacity="0.5"/>
+  <text x="55" y="104" font-family="JetBrains Mono, monospace" font-size="13" font-weight="600" fill="#fff">users</text>
+  <text x="218" y="104" font-family="JetBrains Mono, monospace" font-size="9" fill="rgba(255,255,255,0.6)" text-anchor="end">AUTH</text>
+  <!-- Body border -->
+  <rect x="40" y="118" width="220" height="130" rx="0" ry="10" fill="#1a2035" stroke="#6366f1" stroke-opacity="0.35" stroke-width="1"/>
+  <rect x="40" y="108" width="220" height="10" fill="#1a2035"/>
+  <!-- Rows -->
+  <rect class="tbl-row-odd"  x="41" y="118" width="218" height="24"/>
+  <rect class="tbl-row-even" x="41" y="142" width="218" height="24"/>
+  <rect class="tbl-row-odd"  x="41" y="166" width="218" height="24"/>
+  <rect class="tbl-row-even" x="41" y="190" width="218" height="24"/>
+  <rect class="tbl-row-odd"  x="41" y="214" width="218" height="24" rx="0" ry="8"/>
+  <!-- PK/FK badges and field names -->
+  <rect x="48" y="122" width="22" height="13" rx="3" fill="#6366f1" opacity="0.5"/>
+  <text x="59" y="133" font-family="JetBrains Mono, monospace" font-size="9" fill="#c7d2fe" text-anchor="middle">PK</text>
+  <text x="78" y="133" font-family="JetBrains Mono, monospace" font-size="11" fill="#e8eaf0">id</text>
+  <text x="254" y="133" font-family="JetBrains Mono, monospace" font-size="10" fill="#6366f1" text-anchor="end">INT</text>
+
+  <text x="78" y="157" font-family="JetBrains Mono, monospace" font-size="11" fill="#e8eaf0">name</text>
+  <text x="254" y="157" font-family="JetBrains Mono, monospace" font-size="10" fill="#4b5563" text-anchor="end">VARCHAR</text>
+
+  <text x="78" y="181" font-family="JetBrains Mono, monospace" font-size="11" fill="#e8eaf0">email</text>
+  <text x="254" y="181" font-family="JetBrains Mono, monospace" font-size="10" fill="#4b5563" text-anchor="end">VARCHAR</text>
+
+  <text x="78" y="205" font-family="JetBrains Mono, monospace" font-size="11" fill="#e8eaf0">password</text>
+  <text x="254" y="205" font-family="JetBrains Mono, monospace" font-size="10" fill="#4b5563" text-anchor="end">VARCHAR</text>
+
+  <text x="78" y="229" font-family="JetBrains Mono, monospace" font-size="11" fill="#e8eaf0">role</text>
+  <text x="254" y="229" font-family="JetBrains Mono, monospace" font-size="10" fill="#4b5563" text-anchor="end">ENUM</text>
+  <!-- Bottom rounded cap -->
+  <rect x="40" y="232" width="220" height="16" rx="0" ry="8" fill="#1a2035" stroke="#6366f1" stroke-opacity="0.35" stroke-width="1"/>
+  <rect x="40" y="224" width="220" height="8" fill="#1a2035"/>
+</g>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- TABLE: DEPARTMENTS  x=160 y=130 -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<g class="tbl-group" id="tbl-departments" data-table="departments">
+  <rect class="tbl-header" x="160" y="130" width="300" height="38" rx="10" ry="0" fill="#14b8a6" opacity="0.9"/>
+  <rect x="160" y="154" width="300" height="14" fill="#14b8a6" opacity="0.4"/>
+  <text x="175" y="154" font-family="JetBrains Mono, monospace" font-size="13" font-weight="600" fill="#fff">departments</text>
+  <text x="448" y="154" font-family="JetBrains Mono, monospace" font-size="9" fill="rgba(255,255,255,0.6)" text-anchor="end">CORE</text>
+  <rect x="160" y="168" width="300" height="106" rx="0" ry="10" fill="#1a2035" stroke="#14b8a6" stroke-opacity="0.35" stroke-width="1"/>
+  <rect x="160" y="158" width="300" height="10" fill="#1a2035"/>
+  <rect class="tbl-row-odd"  x="161" y="168" width="298" height="24"/>
+  <rect class="tbl-row-even" x="161" y="192" width="298" height="24"/>
+  <rect class="tbl-row-odd"  x="161" y="216" width="298" height="24"/>
+  <rect x="168" y="172" width="22" height="13" rx="3" fill="#14b8a6" opacity="0.5"/>
+  <text x="179" y="183" font-family="JetBrains Mono, monospace" font-size="9" fill="#99f6e4" text-anchor="middle">PK</text>
+  <text x="198" y="183" font-family="JetBrains Mono, monospace" font-size="11" fill="#e8eaf0">id</text>
+  <text x="454" y="183" font-family="JetBrains Mono, monospace" font-size="10" fill="#14b8a6" text-anchor="end">INT</text>
+  <text x="198" y="207" font-family="JetBrains Mono, monospace" font-size="11" fill="#e8eaf0">name</text>
+  <text x="454" y="207" font-family="JetBrains Mono, monospace" font-size="10" fill="#4b5563" text-anchor="end">VARCHAR(100)</text>
+  <text x="198" y="231" font-family="JetBrains Mono, monospace" font-size="11" fill="#e8eaf0">building</text>
+  <text x="454" y="231" font-family="JetBrains Mono, monospace" font-size="10" fill="#4b5563" text-anchor="end">VARCHAR(100)</text>
+  <rect x="160" y="232" width="300" height="16" rx="0" ry="8" fill="#1a2035" stroke="#14b8a6" stroke-opacity="0.35" stroke-width="1"/>
+  <rect x="160" y="224" width="300" height="8" fill="#1a2035"/>
+</g>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- TABLE: PROFESSORS  x=570 y=130 -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<g class="tbl-group" id="tbl-professors" data-table="professors">
+  <rect class="tbl-header" x="570" y="130" width="280" height="38" rx="10" ry="0" fill="#f97316" opacity="0.9"/>
+  <rect x="570" y="154" width="280" height="14" fill="#f97316" opacity="0.4"/>
+  <text x="585" y="154" font-family="JetBrains Mono, monospace" font-size="13" font-weight="600" fill="#fff">professors</text>
+  <text x="840" y="154" font-family="JetBrains Mono, monospace" font-size="9" fill="rgba(255,255,255,0.6)" text-anchor="end">STAFF</text>
+  <rect x="570" y="168" width="280" height="106" rx="0" ry="10" fill="#1a2035" stroke="#f97316" stroke-opacity="0.35" stroke-width="1"/>
+  <rect x="570" y="158" width="280" height="10" fill="#1a2035"/>
+  <rect class="tbl-row-odd"  x="571" y="168" width="278" height="24"/>
+  <rect class="tbl-row-even" x="571" y="192" width="278" height="24"/>
+  <rect class="tbl-row-odd"  x="571" y="216" width="278" height="24"/>
+  <rect x="578" y="172" width="22" height="13" rx="3" fill="#f97316" opacity="0.5"/>
+  <text x="589" y="183" font-family="JetBrains Mono, monospace" font-size="9" fill="#fed7aa" text-anchor="middle">PK</text>
+  <text x="608" y="183" font-family="JetBrains Mono, monospace" font-size="11" fill="#e8eaf0">id</text>
+  <text x="842" y="183" font-family="JetBrains Mono, monospace" font-size="10" fill="#f97316" text-anchor="end">INT</text>
+  <text x="608" y="207" font-family="JetBrains Mono, monospace" font-size="11" fill="#e8eaf0">name</text>
+  <text x="842" y="207" font-family="JetBrains Mono, monospace" font-size="10" fill="#4b5563" text-anchor="end">VARCHAR(100)</text>
+  <rect x="578" y="220" width="22" height="13" rx="3" fill="#f97316" opacity="0.25"/>
+  <text x="589" y="231" font-family="JetBrains Mono, monospace" font-size="9" fill="#fed7aa" text-anchor="middle">FK</text>
+  <text x="608" y="231" font-family="JetBrains Mono, monospace" font-size="11" fill="#e8eaf0">department_id</text>
+  <text x="842" y="231" font-family="JetBrains Mono, monospace" font-size="10" fill="#14b8a6" text-anchor="end">→ dept</text>
+  <rect x="570" y="232" width="280" height="16" rx="0" ry="8" fill="#1a2035" stroke="#f97316" stroke-opacity="0.35" stroke-width="1"/>
+  <rect x="570" y="224" width="280" height="8" fill="#1a2035"/>
+</g>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- TABLE: STUDENTS  x=40 y=360 -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<g class="tbl-group" id="tbl-students" data-table="students">
+  <rect class="tbl-header" x="40" y="360" width="330" height="38" rx="10" ry="0" fill="#ec4899" opacity="0.9"/>
+  <rect x="40" y="384" width="330" height="14" fill="#ec4899" opacity="0.4"/>
+  <text x="55" y="384" font-family="JetBrains Mono, monospace" font-size="13" font-weight="600" fill="#fff">students</text>
+  <text x="360" y="384" font-family="JetBrains Mono, monospace" font-size="9" fill="rgba(255,255,255,0.6)" text-anchor="end">PEOPLE</text>
+  <rect x="40" y="398" width="330" height="130" rx="0" ry="10" fill="#1a2035" stroke="#ec4899" stroke-opacity="0.35" stroke-width="1"/>
+  <rect x="40" y="388" width="330" height="10" fill="#1a2035"/>
+  <rect class="tbl-row-odd"  x="41" y="398" width="328" height="24"/>
+  <rect class="tbl-row-even" x="41" y="422" width="328" height="24"/>
+  <rect class="tbl-row-odd"  x="41" y="446" width="328" height="24"/>
+  <rect class="tbl-row-even" x="41" y="470" width="328" height="24"/>
+  <rect x="48" y="402" width="22" height="13" rx="3" fill="#ec4899" opacity="0.5"/>
+  <text x="59" y="413" font-family="JetBrains Mono, monospace" font-size="9" fill="#fbcfe8" text-anchor="middle">PK</text>
+  <text x="78" y="413" font-family="JetBrains Mono, monospace" font-size="11" fill="#e8eaf0">id</text>
+  <text x="362" y="413" font-family="JetBrains Mono, monospace" font-size="10" fill="#ec4899" text-anchor="end">INT</text>
+  <text x="78" y="437" font-family="JetBrains Mono, monospace" font-size="11" fill="#e8eaf0">name</text>
+  <text x="362" y="437" font-family="JetBrains Mono, monospace" font-size="10" fill="#4b5563" text-anchor="end">VARCHAR(100)</text>
+  <text x="78" y="461" font-family="JetBrains Mono, monospace" font-size="11" fill="#e8eaf0">image</text>
+  <text x="362" y="461" font-family="JetBrains Mono, monospace" font-size="10" fill="#4b5563" text-anchor="end">VARCHAR(255)</text>
+  <rect x="48" y="474" width="22" height="13" rx="3" fill="#ec4899" opacity="0.25"/>
+  <text x="59" y="485" font-family="JetBrains Mono, monospace" font-size="9" fill="#fbcfe8" text-anchor="middle">FK</text>
+  <text x="78" y="485" font-family="JetBrains Mono, monospace" font-size="11" fill="#e8eaf0">department_id</text>
+  <text x="362" y="485" font-family="JetBrains Mono, monospace" font-size="10" fill="#14b8a6" text-anchor="end">→ dept</text>
+  <rect x="40" y="494" width="330" height="16" rx="0" ry="8" fill="#1a2035" stroke="#ec4899" stroke-opacity="0.35" stroke-width="1"/>
+  <rect x="40" y="486" width="330" height="8" fill="#1a2035"/>
+</g>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- TABLE: COURSES  x=570 y=550 -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<g class="tbl-group" id="tbl-courses" data-table="courses">
+  <rect class="tbl-header" x="570" y="550" width="330" height="38" rx="10" ry="0" fill="#3b82f6" opacity="0.9"/>
+  <rect x="570" y="574" width="330" height="14" fill="#3b82f6" opacity="0.4"/>
+  <text x="585" y="574" font-family="JetBrains Mono, monospace" font-size="13" font-weight="600" fill="#fff">courses</text>
+  <text x="890" y="574" font-family="JetBrains Mono, monospace" font-size="9" fill="rgba(255,255,255,0.6)" text-anchor="end">ACADEMIC</text>
+  <rect x="570" y="588" width="330" height="154" rx="0" ry="10" fill="#1a2035" stroke="#3b82f6" stroke-opacity="0.35" stroke-width="1"/>
+  <rect x="570" y="578" width="330" height="10" fill="#1a2035"/>
+  <rect class="tbl-row-odd"  x="571" y="588" width="328" height="24"/>
+  <rect class="tbl-row-even" x="571" y="612" width="328" height="24"/>
+  <rect class="tbl-row-odd"  x="571" y="636" width="328" height="24"/>
+  <rect class="tbl-row-even" x="571" y="660" width="328" height="24"/>
+  <rect class="tbl-row-odd"  x="571" y="684" width="328" height="24"/>
+  <rect x="578" y="592" width="22" height="13" rx="3" fill="#3b82f6" opacity="0.5"/>
+  <text x="589" y="603" font-family="JetBrains Mono, monospace" font-size="9" fill="#bfdbfe" text-anchor="middle">PK</text>
+  <text x="608" y="603" font-family="JetBrains Mono, monospace" font-size="11" fill="#e8eaf0">id</text>
+  <text x="892" y="603" font-family="JetBrains Mono, monospace" font-size="10" fill="#3b82f6" text-anchor="end">INT</text>
+  <text x="608" y="627" font-family="JetBrains Mono, monospace" font-size="11" fill="#e8eaf0">name</text>
+  <text x="892" y="627" font-family="JetBrains Mono, monospace" font-size="10" fill="#4b5563" text-anchor="end">VARCHAR(100)</text>
+  <text x="608" y="651" font-family="JetBrains Mono, monospace" font-size="11" fill="#e8eaf0">credits</text>
+  <text x="892" y="651" font-family="JetBrains Mono, monospace" font-size="10" fill="#4b5563" text-anchor="end">INT</text>
+  <rect x="578" y="664" width="22" height="13" rx="3" fill="#3b82f6" opacity="0.25"/>
+  <text x="589" y="675" font-family="JetBrains Mono, monospace" font-size="9" fill="#bfdbfe" text-anchor="middle">FK</text>
+  <text x="608" y="675" font-family="JetBrains Mono, monospace" font-size="11" fill="#e8eaf0">department_id</text>
+  <text x="892" y="675" font-family="JetBrains Mono, monospace" font-size="10" fill="#14b8a6" text-anchor="end">→ dept</text>
+  <rect x="578" y="688" width="22" height="13" rx="3" fill="#3b82f6" opacity="0.25"/>
+  <text x="589" y="699" font-family="JetBrains Mono, monospace" font-size="9" fill="#bfdbfe" text-anchor="middle">FK</text>
+  <text x="608" y="699" font-family="JetBrains Mono, monospace" font-size="11" fill="#e8eaf0">professor_id</text>
+  <text x="892" y="699" font-family="JetBrains Mono, monospace" font-size="10" fill="#f97316" text-anchor="end">→ prof</text>
+  <rect x="570" y="718" width="330" height="16" rx="0" ry="8" fill="#1a2035" stroke="#3b82f6" stroke-opacity="0.35" stroke-width="1"/>
+  <rect x="570" y="710" width="330" height="8" fill="#1a2035"/>
+</g>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- TABLE: SEMESTERS  x=930 y=630 -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<g class="tbl-group" id="tbl-semesters" data-table="semesters">
+  <rect class="tbl-header" x="930" y="630" width="280" height="38" rx="10" ry="0" fill="#eab308" opacity="0.9"/>
+  <rect x="930" y="654" width="280" height="14" fill="#eab308" opacity="0.4"/>
+  <text x="945" y="654" font-family="JetBrains Mono, monospace" font-size="13" font-weight="600" fill="#fff">semesters</text>
+  <text x="1200" y="654" font-family="JetBrains Mono, monospace" font-size="9" fill="rgba(255,255,255,0.6)" text-anchor="end">TIME</text>
+  <rect x="930" y="668" width="280" height="82" rx="0" ry="10" fill="#1a2035" stroke="#eab308" stroke-opacity="0.35" stroke-width="1"/>
+  <rect x="930" y="658" width="280" height="10" fill="#1a2035"/>
+  <rect class="tbl-row-odd"  x="931" y="668" width="278" height="24"/>
+  <rect class="tbl-row-even" x="931" y="692" width="278" height="24"/>
+  <rect x="938" y="672" width="22" height="13" rx="3" fill="#eab308" opacity="0.5"/>
+  <text x="949" y="683" font-family="JetBrains Mono, monospace" font-size="9" fill="#fef08a" text-anchor="middle">PK</text>
+  <text x="968" y="683" font-family="JetBrains Mono, monospace" font-size="11" fill="#e8eaf0">id</text>
+  <text x="1202" y="683" font-family="JetBrains Mono, monospace" font-size="10" fill="#eab308" text-anchor="end">INT</text>
+  <text x="968" y="707" font-family="JetBrains Mono, monospace" font-size="11" fill="#e8eaf0">name</text>
+  <text x="1202" y="707" font-family="JetBrains Mono, monospace" font-size="10" fill="#4b5563" text-anchor="end">VARCHAR(50)</text>
+  <rect x="930" y="726" width="280" height="16" rx="0" ry="8" fill="#1a2035" stroke="#eab308" stroke-opacity="0.35" stroke-width="1"/>
+  <rect x="930" y="718" width="280" height="8" fill="#1a2035"/>
+</g>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- TABLE: ENROLLMENTS  x=570 y=640 -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<g class="tbl-group" id="tbl-enrollments" data-table="enrollments">
+  <rect class="tbl-header" x="570" y="640" width="320" height="38" rx="10" ry="0" fill="#22c55e" opacity="0.88"/>
+  <rect x="570" y="664" width="320" height="14" fill="#22c55e" opacity="0.4"/>
+  <text x="585" y="664" font-family="JetBrains Mono, monospace" font-size="13" font-weight="600" fill="#fff">enrollments</text>
+  <text x="880" y="664" font-family="JetBrains Mono, monospace" font-size="9" fill="rgba(255,255,255,0.6)" text-anchor="end">JUNCTION</text>
+  <rect x="570" y="678" width="320" height="130" rx="0" ry="10" fill="#1a2035" stroke="#22c55e" stroke-opacity="0.35" stroke-width="1"/>
+  <rect x="570" y="668" width="320" height="10" fill="#1a2035"/>
+  <rect class="tbl-row-odd"  x="571" y="678" width="318" height="24"/>
+  <rect class="tbl-row-even" x="571" y="702" width="318" height="24"/>
+  <rect class="tbl-row-odd"  x="571" y="726" width="318" height="24"/>
+  <rect class="tbl-row-even" x="571" y="750" width="318" height="24"/>
+  <rect x="578" y="682" width="22" height="13" rx="3" fill="#22c55e" opacity="0.5"/>
+  <text x="589" y="693" font-family="JetBrains Mono, monospace" font-size="9" fill="#bbf7d0" text-anchor="middle">PK</text>
+  <text x="608" y="693" font-family="JetBrains Mono, monospace" font-size="11" fill="#e8eaf0">id</text>
+  <text x="882" y="693" font-family="JetBrains Mono, monospace" font-size="10" fill="#22c55e" text-anchor="end">INT</text>
+  <rect x="578" y="706" width="22" height="13" rx="3" fill="#22c55e" opacity="0.25"/>
+  <text x="589" y="717" font-family="JetBrains Mono, monospace" font-size="9" fill="#bbf7d0" text-anchor="middle">FK</text>
+  <text x="608" y="717" font-family="JetBrains Mono, monospace" font-size="11" fill="#e8eaf0">student_id</text>
+  <text x="882" y="717" font-family="JetBrains Mono, monospace" font-size="10" fill="#ec4899" text-anchor="end">→ student</text>
+  <rect x="578" y="730" width="22" height="13" rx="3" fill="#22c55e" opacity="0.25"/>
+  <text x="589" y="741" font-family="JetBrains Mono, monospace" font-size="9" fill="#bbf7d0" text-anchor="middle">FK</text>
+  <text x="608" y="741" font-family="JetBrains Mono, monospace" font-size="11" fill="#e8eaf0">course_id</text>
+  <text x="882" y="741" font-family="JetBrains Mono, monospace" font-size="10" fill="#3b82f6" text-anchor="end">→ course</text>
+  <rect x="578" y="754" width="22" height="13" rx="3" fill="#22c55e" opacity="0.25"/>
+  <text x="589" y="765" font-family="JetBrains Mono, monospace" font-size="9" fill="#bbf7d0" text-anchor="middle">FK</text>
+  <text x="608" y="765" font-family="JetBrains Mono, monospace" font-size="11" fill="#e8eaf0">semester_id</text>
+  <text x="882" y="765" font-family="JetBrains Mono, monospace" font-size="10" fill="#eab308" text-anchor="end">→ semester</text>
+  <rect x="570" y="774" width="320" height="16" rx="0" ry="8" fill="#1a2035" stroke="#22c55e" stroke-opacity="0.35" stroke-width="1"/>
+  <rect x="570" y="766" width="320" height="8" fill="#1a2035"/>
+</g>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- TABLE: GRADES  x=960 y=750 -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<g class="tbl-group" id="tbl-grades" data-table="grades">
+  <rect class="tbl-header" x="960" y="750" width="280" height="38" rx="10" ry="0" fill="#a855f7" opacity="0.9"/>
+  <rect x="960" y="774" width="280" height="14" fill="#a855f7" opacity="0.4"/>
+  <text x="975" y="774" font-family="JetBrains Mono, monospace" font-size="13" font-weight="600" fill="#fff">grades</text>
+  <text x="1230" y="774" font-family="JetBrains Mono, monospace" font-size="9" fill="rgba(255,255,255,0.6)" text-anchor="end">RESULTS</text>
+  <rect x="960" y="788" width="280" height="106" rx="0" ry="10" fill="#1a2035" stroke="#a855f7" stroke-opacity="0.35" stroke-width="1"/>
+  <rect x="960" y="778" width="280" height="10" fill="#1a2035"/>
+  <rect class="tbl-row-odd"  x="961" y="788" width="278" height="24"/>
+  <rect class="tbl-row-even" x="961" y="812" width="278" height="24"/>
+  <rect class="tbl-row-odd"  x="961" y="836" width="278" height="24"/>
+  <rect x="968" y="792" width="22" height="13" rx="3" fill="#a855f7" opacity="0.5"/>
+  <text x="979" y="803" font-family="JetBrains Mono, monospace" font-size="9" fill="#e9d5ff" text-anchor="middle">PK</text>
+  <text x="998" y="803" font-family="JetBrains Mono, monospace" font-size="11" fill="#e8eaf0">id</text>
+  <text x="1232" y="803" font-family="JetBrains Mono, monospace" font-size="10" fill="#a855f7" text-anchor="end">INT</text>
+  <rect x="968" y="816" width="22" height="13" rx="3" fill="#a855f7" opacity="0.25"/>
+  <text x="979" y="827" font-family="JetBrains Mono, monospace" font-size="9" fill="#e9d5ff" text-anchor="middle">FK</text>
+  <text x="998" y="827" font-family="JetBrains Mono, monospace" font-size="11" fill="#e8eaf0">enrollment_id</text>
+  <text x="1232" y="827" font-family="JetBrains Mono, monospace" font-size="10" fill="#22c55e" text-anchor="end">→ enroll</text>
+  <text x="998" y="851" font-family="JetBrains Mono, monospace" font-size="11" fill="#e8eaf0">grade</text>
+  <text x="1232" y="851" font-family="JetBrains Mono, monospace" font-size="10" fill="#4b5563" text-anchor="end">ENUM(A–F)</text>
+  <rect x="960" y="856" width="280" height="16" rx="0" ry="8" fill="#1a2035" stroke="#a855f7" stroke-opacity="0.35" stroke-width="1"/>
+  <rect x="960" y="848" width="280" height="8" fill="#1a2035"/>
+</g>
+
+</svg>
+</div>
+
+<footer>course_management_system · ER Diagram · PK = Primary Key · FK = Foreign Key</footer>
+
+<div id="tooltip"></div>
+
+<script>
+  const tooltip = document.getElementById('tooltip');
+
+  const tableInfo = {
+    users: 'Auth table — stores login credentials. Not directly linked to other tables.',
+    departments: 'Central table — linked to professors, students, and courses.',
+    professors: 'Staff table — each professor belongs to a department.',
+    students: 'People table — each student belongs to a department.',
+    courses: 'Academic table — linked to department and professor.',
+    semesters: 'Time table — defines academic periods.',
+    enrollments: 'Junction table — connects students, courses, and semesters.',
+    grades: 'Results table — one grade per enrollment (1:1).',
+  };
+
+  document.querySelectorAll('.tbl-group').forEach(g => {
+    g.addEventListener('mouseenter', e => {
+      const name = g.dataset.table;
+      tooltip.innerHTML = `<strong style="color:var(--text)">${name}</strong><br>${tableInfo[name] || ''}`;
+      tooltip.style.opacity = '1';
+    });
+    g.addEventListener('mousemove', e => {
+      tooltip.style.left = (e.clientX + 14) + 'px';
+      tooltip.style.top  = (e.clientY - 10) + 'px';
+    });
+    g.addEventListener('mouseleave', () => {
+      tooltip.style.opacity = '0';
+    });
+  });
+
+  document.querySelectorAll('.conn-line').forEach(line => {
+    line.addEventListener('mouseenter', e => {
+      const rel = line.dataset.rel;
+      tooltip.innerHTML = `<strong style="color:var(--text)">${rel}</strong><br>one-to-many relationship`;
+      tooltip.style.opacity = '1';
+      line.style.opacity = '1';
+      line.style.strokeWidth = '2.5';
+    });
+    line.addEventListener('mousemove', e => {
+      tooltip.style.left = (e.clientX + 14) + 'px';
+      tooltip.style.top  = (e.clientY - 10) + 'px';
+    });
+    line.addEventListener('mouseleave', () => {
+      tooltip.style.opacity = '0';
+      line.style.opacity = '0.55';
+      line.style.strokeWidth = '1.5';
+    });
+  });
+</script>
+</body>
+</html>
